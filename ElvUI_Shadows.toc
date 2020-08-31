@@ -1,0 +1,12 @@
+## Interface: 11305
+## Author: Frederik Verhoef	
+## Version: 1.0
+## Title: |cff1784d1ElvUI|r |cff76FF03Shadows|r
+## Notes: Adds shadows to ElvUI frames.
+## RequiredDeps: ElvUI
+## DefaultState: Enabled
+## X-ElvuiVersion: 1.27
+
+init.lua
+config.lua
+functions.lua
