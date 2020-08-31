@@ -13,25 +13,6 @@ function ElvUI_Shadows:Scale(x)
     return 1 * floor(x / 1 + .5)
 end
 
-function ElvUI_Shadows:SetTemplate(frame)
-    if ElvUI_Shadows.AddOnSkins then
-        AddOnSkins[1]:SetTemplate(frame)
-    elseif frame.SetTemplate then
-        frame:SetTemplate("Transparent", true)
-    else
-        frame:SetBackdrop({
-            bgFile = ElvUI_Shadows.SolidBackground,
-            edgeFile = ElvUI_Shadows.SolidBackground,
-            tile = false,
-            tileSize = 0,
-            edgeSize = 1,
-            insets = {left = 0, right = 0, top = 0, bottom = 0}
-        })
-        frame:SetBackdropColor(.08, .08, .08, .8)
-        frame:SetBackdropBorderColor(0, 0, 0)
-    end
-end
-
 function ElvUI_Shadows:SetInside(obj, anchor, xOffset, yOffset, anchor2)
     xOffset = xOffset or 1
     yOffset = yOffset or 1
@@ -67,14 +48,14 @@ function ElvUI_Shadows:CreateShadows()
     ElvUI_Shadows:CreateUnitFrameShadows("target")
     ElvUI_Shadows:CreateUnitFrameShadows("targettarget")
     ElvUI_Shadows:CreateUnitFrameShadows("focus")
-    if ElvUI_Shadows.IsRetail then
-        ElvUI_Shadows:CreateUnitFrameShadows("assist")
-    end
-    ElvUI_Shadows:CreateUnitFrameShadows("boss")
-    ElvUI_Shadows:CreateUnitFrameShadows("party1")
-    ElvUI_Shadows:CreateUnitFrameShadows("party2")
-    ElvUI_Shadows:CreateUnitFrameShadows("party3")
-    ElvUI_Shadows:CreateUnitFrameShadows("party4")
+
+    -- Unit Frame Groups
+    ElvUI_Shadows:CreateUnitGroupShadows("assist")
+    ElvUI_Shadows:CreateUnitGroupShadows("boss")
+    ElvUI_Shadows:CreateUnitGroupShadows("party")
+    ElvUI_Shadows:CreateUnitGroupShadows("raid")
+    ElvUI_Shadows:CreateUnitGroupShadows("raid40")
+    ElvUI_Shadows:CreateUnitGroupShadows("tank")
 
     -- Action Bars
     for i = 1, 10 do
@@ -238,26 +219,59 @@ function ElvUI_Shadows:CreateShadows()
 end
 
 function ElvUI_Shadows:CreateUnitFrameShadows(frame)
-    if UF[frame] then
-        ElvUI_Shadows:CreateShadow(UF[frame])
-        if UF[frame].Castbar then
-            ElvUI_Shadows:CreateShadow(UF[frame].Castbar.Holder)
+    local unitFrame = UF[frame]
+    if unitFrame then
+        ElvUI_Shadows:CreateShadow(unitFrame)
+        if unitFrame.Castbar then
+            ElvUI_Shadows:CreateShadow(unitFrame.Castbar.Holder)
+        end
+    end
+end
+
+function ElvUI_Shadows:CreateUnitGroupShadows(group)
+    local header = UF[group]
+    if header then
+        if header.groups then
+            for i, group in next, header.groups do
+                for j, obj in next, group do
+                    if type(obj) == "table" then
+                        if obj.unit then
+                            ElvUI_Shadows:CreateShadow(obj)
+                            if obj.Castbar then
+                                ElvUI_Shadows:CreateShadow(obj.Castbar.Holder)
+                            end
+                        end
+                    end
+                end
+            end
+        else
+            -- tank, assist
+            -- TODO: targets
+            for i, obj in next, header do
+                if type(obj) == "table" then
+                    if obj.unit then
+                        ElvUI_Shadows:CreateShadow(obj)
+                        if obj.Castbar then
+                            ElvUI_Shadows:CreateShadow(obj.Castbar.Holder)
+                        end
+                    end
+                end
+            end
         end
     end
 end
 
 function ElvUI_Shadows:CreateShadow(frame, config)
-    if frame and (not frame.Shadow) then
-        if ElvUI_Shadows.AddOnSkins then
-            AddOnSkins[1]:CreateShadow(frame)
+    if frame and (not frame.shadow) and frame.CreateShadow then
+        frame:CreateShadow()
+
+        if frame.shadow then
             if (not config) then
-                config = ElvUI_Shadows.ShadowConfig
+                config = E.db.ElvUI_Shadows.general
             end
-            frame.Shadow.Config = config
-            ElvUI_Shadows:RegisterShadow(frame.Shadow)
-            ElvUI_Shadows:UpdateShadow(frame.Shadow)
-        elseif frame.CreateShadow then
-            frame:CreateShadow()
+            frame.shadow.config = config
+            ElvUI_Shadows:RegisterShadow(frame.shadow)
+            ElvUI_Shadows:UpdateShadow(frame.shadow)
         end
     end
 end
@@ -269,7 +283,7 @@ function ElvUI_Shadows:RegisterShadow(shadow)
     if shadow.isRegistered then
         return
     end
-    ElvUI_Shadows.RegisteredShadows[shadow] = true
+    ElvUI_Shadows.shadows[shadow] = true
     shadow.isRegistered = true
 end
 
@@ -279,27 +293,32 @@ function ElvUI_Shadows:UpdateShadows()
     end
 
     ElvUI_Shadows:CreateShadows()
-    for frame, _ in pairs(self.RegisteredShadows) do
+    for frame, _ in pairs(self.shadows) do
         ElvUI_Shadows:UpdateShadow(frame)
     end
 end
 
 function ElvUI_Shadows:UpdateShadow(shadow)
-    local r, g, b, a = unpack(shadow.Config.Color)
+    if not E.db.ElvUI_Shadows.general.enabled then
+        shadow:Hide()
+    else
+        shadow:Show()
 
-    local backdrop = shadow:GetBackdrop()
-
-    local size = shadow.Config.Size
-    shadow:SetOutside(shadow:GetParent(), size, size)
-
-    backdrop.edgeSize = ElvUI_Shadows:Scale(size > 3 and size or 3)
-
-    shadow:SetBackdrop(backdrop)
-    shadow:SetBackdropColor(r, g, b, 0)
-    shadow:SetBackdropBorderColor(r, g, b, a)
+        local frame = shadow:GetParent()
+        shadow:SetFrameLevel(1)
+        shadow:SetFrameStrata(frame:GetFrameStrata())
+        shadow:SetOutside(frame, shadow.config.size or 3, shadow.config.size or 3)
+        shadow:SetBackdrop({edgeFile = LSM:Fetch("border", "ElvUI GlowBorder"), edgeSize = E:Scale(shadow.config.size > 3 and shadow.config.size or 3)})
+        shadow:SetBackdropColor(shadow.config.color.r, shadow.config.color.g, shadow.config.color.b, 0)
+        shadow:SetBackdropBorderColor(shadow.config.color.r, shadow.config.color.g, shadow.config.color.b, shadow.config.color.a)
+    end
 end
 
-function ElvUI_Shadows:AddonLoaded(addonName)
+function ElvUI_Shadows:GROUP_ROSTER_UPDATE()
+    ElvUI_Shadows:UpdateShadows()
+end
+
+function ElvUI_Shadows:ADDON_LOADED(addonName)
     if addonName == "Blizzard_AuctionUI" then
         ElvUI_Shadows:ScheduleTimer("LoadAuctionFrame", 0.01)
     elseif addonName == "Blizzard_BindingUI" then
