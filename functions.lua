@@ -1,6 +1,7 @@
 local E, L, V, P, G = unpack(ElvUI)
 local ElvUI_Shadows = E:GetModule("ElvUI_Shadows")
 local LSM = LibStub("LibSharedMedia-3.0")
+local A = E:GetModule("Auras")
 local AB = E:GetModule("ActionBars")
 local B = E:GetModule("Bags")
 local DB = E:GetModule("DataBars")
@@ -65,6 +66,17 @@ function ElvUI_Shadows:CreateShadows()
 
     -- Addon Manager
     ElvUI_Shadows:CreateShadow(_G.AddonList)
+
+    -- Auras
+    hooksecurefunc(A, "UpdateAura", function(self, button)
+        ElvUI_Shadows:CreateShadow(button)
+    end)
+    hooksecurefunc(A, "UpdateStatusBar", function(self, button)
+        ElvUI_Shadows:CreateShadow(button)
+    end)
+    hooksecurefunc(A, "UpdateTempEnchant", function(self, button)
+        ElvUI_Shadows:CreateShadow(button)
+    end)
 
     -- Bags
     ElvUI_Shadows:CreateShadow(B.BagFrame)
@@ -149,7 +161,9 @@ function ElvUI_Shadows:CreateShadows()
     ElvUI_Shadows:CreateShadow(_G.InterfaceOptionsFrame)
 
     -- Loot History
+    ElvUI_Shadows:CreateShadow(_G.LootFrame)
     ElvUI_Shadows:CreateShadow(_G.LootHistoryFrame)
+    ElvUI_Shadows:CreateShadow(_G.MasterLooterFrame)
 
     -- Mail Frame
     ElvUI_Shadows:CreateShadow(_G.MailFrame.backdrop)
@@ -171,6 +185,12 @@ function ElvUI_Shadows:CreateShadows()
         ElvUI_Shadows:CreateShadow(nameplate.Health)
         ElvUI_Shadows:CreateShadow(nameplate.Power)
         ElvUI_Shadows:CreateShadow(nameplate.Castbar)
+        hooksecurefunc(nameplate.Buffs, "PostUpdateIcon", function(self, unit, button)
+            ElvUI_Shadows:CreateShadow(button)
+        end)
+        hooksecurefunc(nameplate.Debuffs, "PostUpdateIcon", function(self, unit, button)
+            ElvUI_Shadows:CreateShadow(button)
+        end)
     end)
 
     -- Panels
@@ -252,6 +272,12 @@ function ElvUI_Shadows:CreateUnitFrameShadows(frame)
         if unitFrame.Castbar then
             ElvUI_Shadows:CreateShadow(unitFrame.Castbar.Holder)
         end
+        hooksecurefunc(unitFrame.Buffs, "PostUpdateIcon", function(self, unit, button)
+            ElvUI_Shadows:CreateShadow(button)
+        end)
+        hooksecurefunc(unitFrame.Debuffs, "PostUpdateIcon", function(self, unit, button)
+            ElvUI_Shadows:CreateShadow(button)
+        end)
     end
 end
 
