@@ -6,6 +6,7 @@ local B = E:GetModule("Bags")
 local DB = E:GetModule("DataBars")
 local DT = E:GetModule("DataTexts")
 local LO = E:GetModule("Layout")
+local NP = E:GetModule("NamePlates")
 local S = E:GetModule("Skins")
 local UF = E:GetModule("UnitFrames")
 
@@ -165,6 +166,13 @@ function ElvUI_Shadows:CreateShadows()
         ElvUI_Shadows:CreateShadow(_G["MirrorTimer" .. i .. "StatusBar"])
     end
 
+    -- NamePlates
+    hooksecurefunc(NP, "UpdatePlate", function(self, nameplate)
+        ElvUI_Shadows:CreateShadow(nameplate.Health)
+        ElvUI_Shadows:CreateShadow(nameplate.Power)
+        ElvUI_Shadows:CreateShadow(nameplate.Castbar)
+    end)
+
     -- Panels
     ElvUI_Shadows:CreateShadow(LO.BottomPanel)
     ElvUI_Shadows:CreateShadow(LO.TopPanel)
@@ -281,17 +289,14 @@ function ElvUI_Shadows:CreateUnitGroupShadows(group)
 end
 
 function ElvUI_Shadows:CreateShadow(frame, config)
-    if frame and (not frame.shadow) and frame.CreateShadow then
-        frame:CreateShadow()
-
-        if frame.shadow then
-            if (not config) then
-                config = E.db.ElvUI_Shadows.general
-            end
-            frame.shadow.config = config
-            ElvUI_Shadows:RegisterShadow(frame.shadow)
-            ElvUI_Shadows:UpdateShadow(frame.shadow)
+    if frame and (not frame.shadow) then
+        frame.shadow = CreateFrame("Frame", nil, frame)
+        if (not config) then
+            config = E.db.ElvUI_Shadows.general
         end
+        frame.shadow.config = config
+        ElvUI_Shadows:RegisterShadow(frame.shadow)
+        ElvUI_Shadows:UpdateShadow(frame.shadow)
     end
 end
 
