@@ -101,6 +101,9 @@ function ElvUI_Shadows:CreateShadows()
 
     -- Character Frame
     ElvUI_Shadows:CreateShadow(_G.CharacterFrame.backdrop)
+    if CharacterModelFrame.Background then
+        ElvUI_Shadows:CreateShadow(_G.CharacterModelFrame)
+    end
     ElvUI_Shadows:CreateShadow(_G.ReputationDetailFrame)
     for i = 1, #CHARACTERFRAME_SUBFRAMES do
         local tab = _G["CharacterFrameTab" .. i]
@@ -149,6 +152,7 @@ function ElvUI_Shadows:CreateShadows()
 
     -- Mail Frame
     ElvUI_Shadows:CreateShadow(_G.MailFrame.backdrop)
+    ElvUI_Shadows:CreateShadow(_G.OpenMailFrame.backdrop)
 
     -- Merchant Frame
     ElvUI_Shadows:CreateShadow(_G.MerchantFrame.backdrop)
@@ -170,6 +174,17 @@ function ElvUI_Shadows:CreateShadows()
 
     -- Petition Frame
     ElvUI_Shadows:CreateShadow(_G.PetitionFrame.backdrop)
+
+    -- Popups    
+    for i = 1, 4 do
+        local popup = _G["StaticPopup" .. i]
+        ElvUI_Shadows:CreateShadow(popup)
+    end
+    for i = 1, 4 do
+        local popup = _G["ElvUI_StaticPopup" .. i]
+        ElvUI_Shadows:CreateShadow(popup)
+    end
+    ElvUI_Shadows:CreateShadow(_G.StackSplitFrame)
 
     -- Quest Frame
     ElvUI_Shadows:CreateShadow(_G.QuestFrame.backdrop)
@@ -207,9 +222,13 @@ function ElvUI_Shadows:CreateShadows()
     ElvUI_Shadows:CreateShadow(_G.ShoppingTooltip2)
     ElvUI_Shadows:CreateShadow(_G.EmbeddedItemTooltip)
     ElvUI_Shadows:CreateShadow(DT.tooltip)
+    -- TODO: Options dialog tooltips
 
     -- Trade
-    ElvUI_Shadows:CreateShadow(_G.TradeFrame)
+    ElvUI_Shadows:CreateShadow(_G.TradeFrame.backdrop)
+
+    -- Tutorial
+    ElvUI_Shadows:CreateShadow(_G.TutorialFrame)
 
     -- Video Options (System)
     ElvUI_Shadows:CreateShadow(_G.VideoOptionsFrame)

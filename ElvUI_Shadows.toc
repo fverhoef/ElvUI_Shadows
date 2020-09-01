@@ -1,5 +1,5 @@
 ## Interface: 11305
-## Author: Frederik Verhoef	
+## Author: frza83
 ## Version: 1.0
 ## Title: |cff1784d1ElvUI|r |cff76FF03Shadows|r
 ## Notes: Adds shadows to ElvUI frames.
