@@ -52,6 +52,7 @@ function ElvUI_Shadows:CreateShadows()
     ElvUI_Shadows:CreateUnitFrameShadows("focus")
 
     -- Unit Frame Groups
+    ElvUI_Shadows:CreateUnitGroupShadows("arena")
     ElvUI_Shadows:CreateUnitGroupShadows("assist")
     ElvUI_Shadows:CreateUnitGroupShadows("boss")
     ElvUI_Shadows:CreateUnitGroupShadows("party")
@@ -68,15 +69,18 @@ function ElvUI_Shadows:CreateShadows()
     ElvUI_Shadows:CreateShadow(_G.AddonList)
 
     -- Auras
-    hooksecurefunc(A, "UpdateAura", function(self, button)
-        ElvUI_Shadows:CreateShadow(button)
-    end)
-    hooksecurefunc(A, "UpdateStatusBar", function(self, button)
-        ElvUI_Shadows:CreateShadow(button)
-    end)
-    hooksecurefunc(A, "UpdateTempEnchant", function(self, button)
-        ElvUI_Shadows:CreateShadow(button)
-    end)
+    if not A.hookedShadows then
+        hooksecurefunc(A, "UpdateAura", function(self, button)
+            ElvUI_Shadows:CreateShadow(button)
+        end)
+        hooksecurefunc(A, "UpdateStatusBar", function(self, button)
+            ElvUI_Shadows:CreateShadow(button)
+        end)
+        hooksecurefunc(A, "UpdateTempEnchant", function(self, button)
+            ElvUI_Shadows:CreateShadow(button)
+        end)
+        A.hookedShadows = true
+    end
 
     -- Bags
     ElvUI_Shadows:CreateShadow(B.BagFrame)
@@ -99,12 +103,21 @@ function ElvUI_Shadows:CreateShadows()
     ElvUI_Shadows:CreateShadow(DB.repBar)
 
     -- ElvUI Options
-    hooksecurefunc(E, "Config_WindowOpened", function()
-        local optionsFrame = E:Config_GetWindow()
-        if optionsFrame then
-            ElvUI_Shadows:CreateShadow(optionsFrame)
-        end
-    end)
+    if not E.hookedShadows then
+        hooksecurefunc(E, "Config_WindowOpened", function()
+            local optionsFrame = E:Config_GetWindow()
+            if optionsFrame then
+                ElvUI_Shadows:CreateShadow(optionsFrame)
+            end
+        end)
+
+        -- ElvUI Popups
+        hooksecurefunc(E, "StaticPopupSpecial_Show", function(self, frame)
+            ElvUI_Shadows:CreateShadow(frame)
+        end)
+
+        E.hookedShadows = true
+    end
 
     -- Channels
     ElvUI_Shadows:CreateShadow(_G.ChannelFrame)
@@ -123,6 +136,33 @@ function ElvUI_Shadows:CreateShadows()
         if tab and false then
             ElvUI_Shadows:CreateShadow(tab.backdrop)
             -- tab.backdrop:SetFrameLevel(_G.CharacterFrame:GetFrameLevel() - 1)
+        end
+    end
+    local slots = {
+        "HeadSlot",
+        "NeckSlot",
+        "ShoulderSlot",
+        "BackSlot",
+        "ChestSlot",
+        "ShirtSlot",
+        "TabardSlot",
+        "WristSlot",
+        "HandsSlot",
+        "WaistSlot",
+        "LegsSlot",
+        "FeetSlot",
+        "Finger0Slot",
+        "Finger1Slot",
+        "Trinket0Slot",
+        "Trinket1Slot",
+        "MainHandSlot",
+        "SecondaryHandSlot",
+        "RangedSlot"
+    }
+    for i, slot in next, slots do
+        local button = _G["Character" .. slot]
+        if button then
+            ElvUI_Shadows:CreateShadow(button)
         end
     end
 
@@ -181,17 +221,22 @@ function ElvUI_Shadows:CreateShadows()
     end
 
     -- NamePlates
-    hooksecurefunc(NP, "UpdatePlate", function(self, nameplate)
-        ElvUI_Shadows:CreateShadow(nameplate.Health)
-        ElvUI_Shadows:CreateShadow(nameplate.Power)
-        ElvUI_Shadows:CreateShadow(nameplate.Castbar)
-        hooksecurefunc(nameplate.Buffs, "PostUpdateIcon", function(self, unit, button)
-            ElvUI_Shadows:CreateShadow(button)
+    if not NP.hookedShadows then
+        hooksecurefunc(NP, "UpdatePlate", function(self, nameplate)
+            if not nameplate.Health.shadow then
+                ElvUI_Shadows:CreateShadow(nameplate.Health)
+                ElvUI_Shadows:CreateShadow(nameplate.Power)
+                ElvUI_Shadows:CreateShadow(nameplate.Castbar)
+                hooksecurefunc(nameplate.Buffs, "PostUpdateIcon", function(self, unit, button)
+                    ElvUI_Shadows:CreateShadow(button)
+                end)
+                hooksecurefunc(nameplate.Debuffs, "PostUpdateIcon", function(self, unit, button)
+                    ElvUI_Shadows:CreateShadow(button)
+                end)
+            end
         end)
-        hooksecurefunc(nameplate.Debuffs, "PostUpdateIcon", function(self, unit, button)
-            ElvUI_Shadows:CreateShadow(button)
-        end)
-    end)
+        NP.hookedShadows = true
+    end
 
     -- Panels
     ElvUI_Shadows:CreateShadow(LO.BottomPanel)
@@ -217,6 +262,10 @@ function ElvUI_Shadows:CreateShadows()
     -- Quest Frame
     ElvUI_Shadows:CreateShadow(_G.QuestFrame.backdrop)
     ElvUI_Shadows:CreateShadow(_G.QuestLogFrame.backdrop)
+
+    -- Raid Utility Panel
+    ElvUI_Shadows:CreateShadow(RaidUtilityPanel)
+    ElvUI_Shadows:CreateShadow(_G.RaidControlButton)
 
     -- Ready Check
     ElvUI_Shadows:CreateShadow(_G.ReadyCheckFrame)
@@ -267,7 +316,7 @@ end
 
 function ElvUI_Shadows:CreateUnitFrameShadows(frame)
     local unitFrame = UF[frame]
-    if unitFrame then
+    if unitFrame and (not frame.shadow) then
         ElvUI_Shadows:CreateShadow(unitFrame)
         if unitFrame.Castbar then
             ElvUI_Shadows:CreateShadow(unitFrame.Castbar.Holder)
@@ -383,6 +432,8 @@ function ElvUI_Shadows:ADDON_LOADED(addonName)
         ElvUI_Shadows:ScheduleTimer("LoadInspectFrame", 0.01)
     elseif addonName == "Blizzard_MacroUI" then
         ElvUI_Shadows:ScheduleTimer("LoadMacroFrame", 0.01)
+    elseif addonName == "Blizzard_RaidUI" then
+        ElvUI_Shadows:ScheduleTimer("LoadRaidFrame", 0.01)
     elseif addonName == "Blizzard_TalentUI" then
         ElvUI_Shadows:ScheduleTimer("LoadTalentFrame", 0.01)
     elseif addonName == "Blizzard_TradeSkillUI" then
@@ -446,6 +497,18 @@ function ElvUI_Shadows:LoadMacroFrame()
         ElvUI_Shadows:CreateShadow(_G.MacroPopupFrame)
     else
         ElvUI_Shadows:ScheduleTimer("LoadMacroFrame", 0.01)
+    end
+end
+
+function ElvUI_Shadows:LoadRaidFrame()
+    if _G["RaidPullout1"] then
+        local rp
+        for i = 1, _G.NUM_RAID_PULLOUT_FRAMES do
+            rp = _G["RaidPullout" .. i]
+            ElvUI_Shadows:CreateShadow(rp.backdrop)
+        end
+    else
+        ElvUI_Shadows:ScheduleTimer("LoadRaidFrame", 0.01)
     end
 end
 
