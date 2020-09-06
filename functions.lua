@@ -90,10 +90,10 @@ function ElvUI_Shadows:CreateShadows()
     ElvUI_Shadows:CreateShadow(_G.WorldStateScoreFrame.backdrop)
 
     -- Chat
-    ElvUI_Shadows:CreateShadow(_G.LeftChatPanel)
+    ElvUI_Shadows:CreateShadow(_G.LeftChatPanel.backdrop)
     ElvUI_Shadows:CreateShadow(_G.LeftChatDataPanel)
     ElvUI_Shadows:CreateShadow(_G.LeftChatToggleButton)
-    ElvUI_Shadows:CreateShadow(_G.RightChatPanel)
+    ElvUI_Shadows:CreateShadow(_G.RightChatPanel.backdrop)
     ElvUI_Shadows:CreateShadow(_G.RightChatDataPanel)
     ElvUI_Shadows:CreateShadow(_G.RightChatToggleButton)
 
