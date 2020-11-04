@@ -1,5 +1,5 @@
 ## Interface: 11305
-## Author: frza83
+## Author: Neya
 ## Version: 1.0
 ## Title: |cff1784d1ElvUI|r |cff76FF03Shadows|r
 ## Notes: Adds shadows to ElvUI frames.
@@ -7,6 +7,6 @@
 ## DefaultState: Enabled
 ## X-ElvuiVersion: 1.27
 
-init.lua
-config.lua
-functions.lua
+Init.lua
+Config.lua
+Core.lua

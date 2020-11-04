@@ -3,19 +3,19 @@ local E, L, V, P, G = unpack(ElvUI) -- Import: Engine, Locales, PrivateDB, Profi
 local EP = LibStub("LibElvUIPlugin-1.0")
 local LSM = LibStub("LibSharedMedia-3.0")
 
-local ElvUI_Shadows = E:NewModule("ElvUI_Shadows", "AceHook-3.0", "AceEvent-3.0", "AceTimer-3.0")
-ElvUI_Shadows.shadows = {}
-ElvUI_Shadows.title = "|cff1784d1ElvUI|r |cff76FF03Shadows|r"
+local Module = E:NewModule("ElvUI_Shadows", "AceHook-3.0", "AceEvent-3.0", "AceTimer-3.0")
+Module.shadows = {}
+Module.title = "|cff1784d1ElvUI|r |cff76FF03Shadows|r"
 
-_G.ElvUI_Shadows = ElvUI_Shadows
+_G.ElvUI_Shadows = Module
 
-function ElvUI_Shadows:Initialize()
-    ElvUI_Shadows:CreateShadows()
-    ElvUI_Shadows:ScheduleTimer("UpdateShadows", 1)
-    ElvUI_Shadows:RegisterEvent("ADDON_LOADED", ElvUI_Shadows.ADDON_LOADED)
-    ElvUI_Shadows:RegisterEvent("GROUP_ROSTER_UPDATE", ElvUI_Shadows.GROUP_ROSTER_UPDATE)
+function Module:Initialize()
+    Module:CreateShadows()
+    Module:ScheduleTimer("UpdateShadows", 1)
+    Module:RegisterEvent("ADDON_LOADED", Module.ADDON_LOADED)
+    Module:RegisterEvent("GROUP_ROSTER_UPDATE", Module.GROUP_ROSTER_UPDATE)
 
-    EP:RegisterPlugin(addonName, ElvUI_Shadows.InsertOptions)
+    EP:RegisterPlugin(addonName, Module.InsertOptions)
 end
 
-E:RegisterModule(ElvUI_Shadows:GetName())
+E:RegisterModule(Module:GetName())

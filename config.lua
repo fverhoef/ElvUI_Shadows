@@ -1,19 +1,19 @@
 local E, L, V, P, G = unpack(ElvUI)
-local ElvUI_Shadows = E:GetModule("ElvUI_Shadows")
+local Module = E:GetModule("ElvUI_Shadows")
 
 if E.db.ElvUI_Shadows == nil then
     E.db.ElvUI_Shadows = {}
 end
-P["ElvUI_Shadows"] = {general = {enabled = true, color = {r = 0, g = 0, b = 0, a = 0.65}, size = 5}}
+P["ElvUI_Shadows"] = {general = {enabled = true, color = {r = 0, g = 0, b = 0, a = 0.5}, size = 3}}
 
-function ElvUI_Shadows:InsertOptions()
+function Module:InsertOptions()
     E.Options.args.ElvUI_Shadows = {
         order = 100,
         type = "group",
         name = ElvUI_Shadows.title,
         childGroups = "tab",
         args = {
-            name = {order = 1, type = "header", name = ElvUI_Shadows.title},
+            name = {order = 1, type = "header", name = Module.title},
             general = {
                 order = 1,
                 type = "group",
@@ -28,7 +28,7 @@ function ElvUI_Shadows:InsertOptions()
                         end,
                         set = function(info, value)
                             E.db.ElvUI_Shadows.general.enabled = value
-                            ElvUI_Shadows:UpdateShadows()
+                            Module:UpdateShadows()
                         end
                     },
                     color = {
@@ -43,7 +43,7 @@ function ElvUI_Shadows:InsertOptions()
                         set = function(info, r, g, b, a)
                             local t = E.db.ElvUI_Shadows.general.color
                             t.r, t.g, t.b, t.a = r, g, b, a
-                            ElvUI_Shadows:UpdateShadows()
+                            Module:UpdateShadows()
                         end
                     },
                     size = {
@@ -58,7 +58,7 @@ function ElvUI_Shadows:InsertOptions()
                         end,
                         set = function(info, value)
                             E.db.ElvUI_Shadows.general.size = value
-                            ElvUI_Shadows:UpdateShadows()
+                            Module:UpdateShadows()
                         end
                     }
                 }
