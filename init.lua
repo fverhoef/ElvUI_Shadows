@@ -3,11 +3,13 @@ local E, L, V, P, G = unpack(ElvUI) -- Import: Engine, Locales, PrivateDB, Profi
 local EP = LibStub("LibElvUIPlugin-1.0")
 local LSM = LibStub("LibSharedMedia-3.0")
 
-local Module = E:NewModule("ElvUI_Shadows", "AceHook-3.0", "AceEvent-3.0", "AceTimer-3.0")
+local Module = E:NewModule(addonName, "AceHook-3.0", "AceEvent-3.0", "AceTimer-3.0")
 Module.shadows = {}
-Module.title = "|cff1784d1ElvUI|r |cff76FF03Shadows|r"
+Module.name = "Shadows"
+Module.title = "|cff76FF03" .. Module.name .. "|r"
 
-_G.ElvUI_Shadows = Module
+addonTable[1] = Module
+_G[addonName] = Module
 
 function Module:Initialize()
     Module:CreateShadows()
@@ -15,7 +17,7 @@ function Module:Initialize()
     Module:RegisterEvent("ADDON_LOADED", Module.ADDON_LOADED)
     Module:RegisterEvent("GROUP_ROSTER_UPDATE", Module.GROUP_ROSTER_UPDATE)
 
-    EP:RegisterPlugin(addonName, Module.InsertOptions)
+    EP:RegisterPlugin(Module.name, Module.InsertOptions)
 end
 
 E:RegisterModule(Module:GetName())

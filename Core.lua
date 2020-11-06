@@ -1,5 +1,6 @@
+local addonName, addonTable = ...
+local Module = addonTable[1]
 local E, L, V, P, G = unpack(ElvUI)
-local Module = E:GetModule("ElvUI_Shadows")
 local LSM = LibStub("LibSharedMedia-3.0")
 local A = E:GetModule("Auras")
 local AB = E:GetModule("ActionBars")
@@ -330,15 +331,19 @@ end
 function Module:CreateUnitFrameShadows(frame)
     local unitFrame = UF[frame]
     if unitFrame and (not frame.shadow) then
-        Module:CreateShadow(unitFrame)
+        if unitFrame.USE_MINI_POWERBAR then
+            Module:CreateShadow(unitFrame.Health)
+        else
+            Module:CreateShadow(unitFrame)
+        end
         if unitFrame.Castbar then
             Module:CreateShadow(unitFrame.Castbar.Holder)
         end
-        if unitFrame.Power and unitFrame.POWERBAR_DETACHED then
+        if unitFrame.Power and (unitFrame.POWERBAR_DETACHED or unitFrame.USE_MINI_POWERBAR) then
             Module:CreateShadow(unitFrame.Power.Holder)
         end
-        if unitFrame.ClassBar then
-            Module:CreateShadow(unitFrame.ClassBar.Holder)
+        if unitFrame.ClassBar and unitFrame[unitFrame.ClassBar] and unitFrame[unitFrame.ClassBar]:IsShown() then
+            Module:CreateShadow(unitFrame.ClassBarHolder)
         end
         hooksecurefunc(unitFrame.Buffs, "PostUpdateIcon", function(self, unit, button)
             Module:CreateShadow(button)
@@ -357,7 +362,12 @@ function Module:CreateUnitGroupShadows(group)
                 for j, obj in next, group do
                     if type(obj) == "table" then
                         if obj.unit then
-                            Module:CreateShadow(obj)
+                            if obj.USE_MINI_POWERBAR then
+                                Module:CreateShadow(obj.Health)
+                                Module:CreateShadow(obj.Power)
+                            else
+                                Module:CreateShadow(obj)
+                            end
                             if obj.Castbar then
                                 Module:CreateShadow(obj.Castbar.Holder)
                             end
@@ -371,7 +381,12 @@ function Module:CreateUnitGroupShadows(group)
             for i, obj in next, header do
                 if type(obj) == "table" then
                     if obj.unit then
-                        Module:CreateShadow(obj)
+                        if obj.USE_MINI_POWERBAR then
+                            Module:CreateShadow(obj.Health)
+                            Module:CreateShadow(obj.Power)
+                        else
+                            Module:CreateShadow(obj)
+                        end
                         if obj.Castbar then
                             Module:CreateShadow(obj.Castbar.Holder)
                         end
@@ -386,7 +401,7 @@ function Module:CreateShadow(frame, config)
     if frame and (not frame.shadow) then
         frame.shadow = CreateFrame("Frame", nil, frame)
         if (not config) then
-            config = E.db.ElvUI_Shadows.general
+            config = E.db[addonName].general
         end
         frame.shadow.config = config
         Module:RegisterShadow(frame.shadow)
@@ -417,7 +432,7 @@ function Module:UpdateShadows()
 end
 
 function Module:UpdateShadow(shadow)
-    if not E.db.ElvUI_Shadows.general.enabled then
+    if not E.db[addonName].general.enabled then
         shadow:Hide()
     else
         shadow:Show()
