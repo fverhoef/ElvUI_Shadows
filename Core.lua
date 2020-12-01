@@ -288,12 +288,6 @@ function Module:CreateShadows()
         Module:CreateShadow(_G[merathilis[1].Title .. "TopPanel"])
         Module:CreateShadow(_G[merathilis[1].Title .. "BottomPanel"])
     end
-
-    local classicClassBars = _G["ClassicClassBars"]
-    if classicClassBars then
-        Module:CreateShadow(classicClassBars.MageBar)
-        Module:CreateShadow(classicClassBars.ShamanBar)
-    end
 end
 
 function Module:CreateUnitFrameShadows(frame)
