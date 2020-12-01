@@ -12,38 +12,6 @@ local NP = E:GetModule("NamePlates")
 local S = E:GetModule("Skins")
 local UF = E:GetModule("UnitFrames")
 
-function Module:Scale(x)
-    return 1 * floor(x / 1 + .5)
-end
-
-function Module:SetInside(obj, anchor, xOffset, yOffset, anchor2)
-    xOffset = xOffset or 1
-    yOffset = yOffset or 1
-    anchor = anchor or obj:GetParent()
-
-    assert(anchor)
-    if obj:GetPoint() then
-        obj:ClearAllPoints()
-    end
-
-    obj:SetPoint("TOPLEFT", anchor, "TOPLEFT", xOffset, -yOffset)
-    obj:SetPoint("BOTTOMRIGHT", anchor2 or anchor, "BOTTOMRIGHT", -xOffset, yOffset)
-end
-
-function Module:SetOutside(obj, anchor, xOffset, yOffset, anchor2)
-    xOffset = xOffset or 1
-    yOffset = yOffset or 1
-    anchor = anchor or obj:GetParent()
-
-    assert(anchor)
-    if obj:GetPoint() then
-        obj:ClearAllPoints()
-    end
-
-    obj:SetPoint("TOPLEFT", anchor, "TOPLEFT", -xOffset, yOffset)
-    obj:SetPoint("BOTTOMRIGHT", anchor2 or anchor, "BOTTOMRIGHT", xOffset, -yOffset)
-end
-
 function Module:CreateShadows()
     -- Unit Frames
     Module:CreateUnitFrameShadows("player")
@@ -422,6 +390,7 @@ end
 
 function Module:UpdateShadows()
     if UnitAffectingCombat("player") then
+        Module:ScheduleTimer("UpdateShadows", 1)
         return
     end
 
